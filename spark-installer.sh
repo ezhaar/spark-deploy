@@ -1,17 +1,21 @@
-#!/bin/bash
+#!/bin/bash -x
 
-apt-get update && apt-get -y upgrade > /dev/null
+apt-get update > /dev/null 
+apt-get -y upgrade > /dev/null
 
+# Check if java is installed
 command -v javac>/dev/null 2>&1 || { echo >&2 "I require java but it's not installed. Installing java"; sudo apt-get install -y default-jdk;}
 
 DOWNLOAD_DIR=~/Downloads
 HADOOP_DIR=/usr/local/hadoop-1.1.2
 SCALA_DIR=/usr/local/scala-2.9.3
+SPARK_DIR=/usr/local/spark
 
 if [ ! -d $DOWNLOAD_DIR ]; then
         mkdir $DOWNLOAD_DIR
 fi
 
+# if java_home is not set
 if [[! -z "$JAVA_HOME" ]]; then
         echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.profile
 fi
