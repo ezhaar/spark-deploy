@@ -19,8 +19,9 @@ if [ ! -d $DOWNLOAD_DIR ]; then
 fi
 
 # if java_home is not set
-if [ ! -z "$JAVA_HOME" ]; then
+if [ -z "$JAVA_HOME" ]; then
         echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.profile
+	source ~/.profile
 fi
 
 # download the src for hadoop, scala and spark
@@ -41,8 +42,9 @@ chmod -R 777 $SCALA_DIR
 
 # Update .profile
 #if hadoop prefix is not set, then set it and add to path
-if [ ! -z "$HADOOP_PREFIX" ]; then
+if [ -z "$HADOOP_PREFIX" ]; then
         echo "export HADOOP_PREFIX=$HADOOP_DIR" >> ~/.profile
+	source ~/.profile
         echo "export PATH=$PATH:$HADOOP_PREFIX/bin" >> ~/.profile
         source ~/.profile
 fi
