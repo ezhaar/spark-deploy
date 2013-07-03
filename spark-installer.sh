@@ -28,7 +28,7 @@ fi
 cd $DOWNLOAD_DIR
 wget http://mirrors.sonic.net/apache/hadoop/common/hadoop-1.1.2/hadoop-1.1.2.tar.gz -P $DOWNLOAD_DIR
 wget http://www.scala-lang.org/downloads/distrib/files/scala-2.9.3.tgz -P $DOWNLOAD_DIR
-git clone git@github.com/mesos/spark.git
+git clone git://github.com/mesos/spark.git
 
 #Extract hadoop and Scala
 tar -xzf hadoop-1.1.2.tar.gz
@@ -78,12 +78,14 @@ ln -s $SCALA_DIR/bin/scalap /usr/bin/scalap
 # Now build Spark
 cp -R $DOWNLOAD_DIR/spark $SPARK_DIR
 
-mv $SPARK_DIR/conf/spark-env.sh.template spark-env.sh
-echo "export SCALA_HOME=$SCALA_DIR" >> spark-env.sh
+mv $SPARK_DIR/conf/spark-env.sh.template $SPARK_DIR/conf/spark-env.sh
+echo "export SCALA_HOME=$SCALA_DIR" >> $SPARK_DIR/conf/spark-env.sh
 
 #set hadoop version in spark build
-sed -i 'S|1.0.4|1.1.2|' $SPARK_DIR/project/SparkBuild.scala
+sed -i 's|1.0.4|1.1.2|' $SPARK_DIR/project/SparkBuild.scala
 cd $SPARK_DIR
 sbt/sbt package
+#start standalone spark cluster
+#bin/spark-master.sh
 
 
