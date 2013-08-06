@@ -4,30 +4,35 @@ apt-get update > /dev/null
 apt-get -y upgrade > /dev/null
 
 # Check if java is installed
-command -v javac>/dev/null 2>&1 || { echo >&2 "I require java but it's not installed. Installing java"; sudo apt-get install -y default-jdk;}
+command -v javac>/dev/null 2>&1 || { echo >&2 "I require java but it's not \
+    installed. Installing java"; sudo apt-get install -y default-jdk;}
+# if java_home is not set
+if [ -z "$JAVA_HOME" ]; then
+        echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.bashrc
+	source ~/.bashrc
+fi
 
 # Initialize directories
-
+pwd=$PWD
+SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SRC_DIR
+cd ..
+CONF_FILES_DIR=$PWD/config_files
+cd $pwd
 DOWNLOAD_DIR=~/Downloads
 HADOOP_DIR=/usr/local/hadoop-1.1.2
 SCALA_DIR=/usr/local/scala-2.9.3
 SPARK_DIR=/usr/local/spark
-
 # if Downloads folder does not exist, create it
 if [ ! -d $DOWNLOAD_DIR ]; then
         mkdir $DOWNLOAD_DIR
 fi
 
-# if java_home is not set
-if [ -z "$JAVA_HOME" ]; then
-        echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.profile
-	source ~/.profile
-fi
-
 # download the src for hadoop, scala and spark
 cd $DOWNLOAD_DIR
-wget http://mirrors.sonic.net/apache/hadoop/common/hadoop-1.1.2/hadoop-1.1.2.tar.gz -P $DOWNLOAD_DIR
-wget http://www.scala-lang.org/downloads/distrib/files/scala-2.9.3.tgz -P $DOWNLOAD_DIR
+wget https://github.com/apache/hadoop-common/archive/release-1.1.2.tar.gz \
+    -P $DOWNLOAD_DIR
+wget https://github.com/scala/scala/archive/v2.9.3.tar.gz -P $DOWNLOAD_DIR
 git clone git://github.com/mesos/spark.git
 
 #Extract hadoop and Scala
@@ -40,25 +45,26 @@ cp -R scala-2.9.3 $SCALA_DIR
 chmod -R 777 $HADOOP_DIR
 chmod -R 777 $SCALA_DIR
 
-# Update .profile
+# Update .bashrc
 #if hadoop prefix is not set, then set it and add to path
 if [ -z "$HADOOP_PREFIX" ]; then
-        echo "export HADOOP_PREFIX=$HADOOP_DIR" >> ~/.profile
-	source ~/.profile
-        echo "export PATH=$PATH:$HADOOP_PREFIX/bin" >> ~/.profile
-        source ~/.profile
+        echo "export HADOOP_PREFIX=$HADOOP_DIR" >> ~/.bashrc
+	source ~/.bashrc
+        echo "export PATH=$PATH:$HADOOP_PREFIX/bin" >> ~/.bashrc
+        source ~/.bashrc
 fi
 
 #create directory for hadoop to store files
 mkdir -p /home/admin/hadoop
 
-# download hadoop conf files from git
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/core-site.xml -P $HADOOP_DIR/conf
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/mapred-site.xml -P $HADOOP_DIR/conf
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/hdfs-site.xml -P $HADOOP_DIR/conf
+# copy configuration files for hadoop
+cp $CONF_FLES_DIR/core-site.xml $HADOOP_DIR/conf
+cp $CONF_FILES_DIR/mapred-site.xml $HADOOP_DIR/conf
+cp $CONF_FILES_DIR/hdfs-site.xml $HADOOP_DIR/conf
+mv $HADOOP_DIR/conf/hadoop-env.sh.template $HADOOP_DIR/conf/hadoop-env.sh
 #set JAVA_HOME in hadoop config file
-echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /usr/local/hadoop-1.1.2/conf/hadoop-env.sh
-
+echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /usr/local/hadoop-1.1.2/\
+    conf/hadoop-env.sh
 # Format the name node
 hadoop namenode -format
 
@@ -73,7 +79,6 @@ ln -s $SCALA_DIR/bin/sbaz /usr/bin/sbaz
 ln -s $SCALA_DIR/bin/sbaz-setup /usr/bin/sbaz-setup
 ln -s $SCALA_DIR/bin/scaladoc /usr/bin/scaladoc
 ln -s $SCALA_DIR/bin/scalap /usr/bin/scalap
-
 
 # Now build Spark
 cp -R $DOWNLOAD_DIR/spark $SPARK_DIR
