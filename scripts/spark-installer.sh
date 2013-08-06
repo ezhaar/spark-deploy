@@ -53,9 +53,9 @@ fi
 mkdir -p /home/admin/hadoop
 
 # download hadoop conf files from git
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/core-site.xml -P $HADOOP_DIR/conf
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/mapred-site.xml -P $HADOOP_DIR/conf
-wget https://raw.github.com/ezhaar/spark-0.7.2/master/hdfs-site.xml -P $HADOOP_DIR/conf
+wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/core-site.xml -P $HADOOP_DIR/conf
+wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/mapred-site.xml -P $HADOOP_DIR/conf
+wget https://raw.github.com/ezhaar/spark-0.7.2/master/config-files/hdfs-site.xml -P $HADOOP_DIR/conf
 #set JAVA_HOME in hadoop config file
 echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /usr/local/hadoop-1.1.2/conf/hadoop-env.sh
 

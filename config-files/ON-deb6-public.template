@@ -1,0 +1,27 @@
+CONTEXT=[
+  FILES="/cloud/vm/conf/context/debian/init.sh",
+  HOSTNAME="$NAME-$VMID",
+  IP_PUBLIC="$NIC[IP, NETWORK=\"Public LAN\"]",
+  ROOT_PUBKEY="$USER[SSH_KEY]",
+  SSH_KEY="$USER[SSH_KEY]",
+  USERNAME="admin",
+  USER_PUBKEY="$USER[SSH_KEY]" ]
+CPU="2"
+DISK=[
+  IMAGE="iz-deb6",
+  IMAGE_UNAME="izhaar" ]
+MEMORY="4000"
+NAME="iz-deb-public"
+NIC=[
+  NETWORK="Public LAN",
+  NETWORK_UNAME="oneadmin" ]
+NIC=[
+  NETWORK="Private LAN",
+  NETWORK_UNAME="oneadmin" ]
+OS=[
+  ARCH="x86_64",
+  BOOT="hd" ]
+RAW=[
+  TYPE="kvm" ]
+TEMPLATE_ID="39"
+VCPU="2"
