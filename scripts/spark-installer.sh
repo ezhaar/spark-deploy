@@ -17,7 +17,7 @@ pwd=$PWD
 SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SRC_DIR
 cd ..
-CONF_FILES_DIR=$PWD/config_files
+CONF_FILES_DIR=$PWD/config-files
 cd $pwd
 DOWNLOAD_DIR=~/Downloads
 HADOOP_DIR=/usr/local/hadoop-1.1.2
@@ -32,11 +32,11 @@ fi
 cd $DOWNLOAD_DIR
 wget https://github.com/apache/hadoop-common/archive/release-1.1.2.tar.gz \
     -P $DOWNLOAD_DIR
-wget https://github.com/scala/scala/archive/v2.9.3.tar.gz -P $DOWNLOAD_DIR
+wget http://www.scala-lang.org/files/archive/scala-2.9.3.tgz -P $DOWNLOAD_DIR
 git clone git://github.com/mesos/spark.git
 
 #Extract hadoop and Scala
-tar -xzf hadoop-1.1.2.tar.gz
+tar -xzf $DOWNLOAD_DIR/release-1.1.2.tar.gz -c $HADOOP_DIR
 tar -zxf scala-2.9.3.tgz
 
 # Move hadoop and scala to system wide directories
