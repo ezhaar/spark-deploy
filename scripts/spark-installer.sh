@@ -36,7 +36,7 @@ if [ $? == 0 ]; then
 else
     wget http://psg.mtu.edu/pub/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz -P $DOWNLOAD_DIR
     tar -xzf $DOWNLOAD_DIR/hadoop-1.2.1.tar.gz
-    mv hadoop-1.2.2 $HADOOP_DIR
+    mv hadoop-1.2.1 $HADOOP_DIR
     if [ -z "$HADOOP_PREFIX" ]; then
         echo "export HADOOP_PREFIX=$HADOOP_DIR" >> ~/.bashrc
         echo "export PATH=$PATH:$HADOOP_DIR/bin" >> ~/.bashrc
@@ -62,7 +62,7 @@ else
 fi
 
 # Check for Scala
-scalac -helf 2>&1>/dev/null
+scalac -help 2>&1>/dev/null
 if [ $? == 0  ]; then
     echo 'Scala was found'
 else
