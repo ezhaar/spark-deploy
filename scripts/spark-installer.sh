@@ -1,9 +1,8 @@
-#!/bin/bash -x
-
+#!/bin/bash 
 apt-get update > /dev/null 
 apt-get -y upgrade > /dev/null
 
-# Check if java is installed
+## JAVA
 command -v javac>/dev/null 2>&1 || { echo >&2 "I require java but it's not \
     installed. Installing java"; sudo apt-get install -y default-jdk;}
 # if java_home is not set
@@ -29,7 +28,8 @@ if [ ! -d $DOWNLOAD_DIR ]; then
 fi
 cd $DOWNLOAD_DIR
 
-# Check for Hadoop
+
+## HADOOP
 hadoop -h 2>&1>/dev/null
 if [ $? == 0 ]; then
     echo 'Hadoop was found'
@@ -61,7 +61,7 @@ else
 
 fi
 
-# Check for Scala
+## SCALA
 scalac -help 2>&1>/dev/null
 if [ $? == 0  ]; then
     echo 'Scala was found'
@@ -85,6 +85,7 @@ else
 
 fi
 
+## SPARK
 git clone git://github.com/mesos/spark.git
 # Now build Spark
 cp -R $DOWNLOAD_DIR/spark $SPARK_DIR
@@ -97,6 +98,6 @@ sed -i 's|1.0.4|1.1.2|' $SPARK_DIR/project/SparkBuild.scala
 cd $SPARK_DIR
 sbt/sbt package
 #start standalone spark cluster
-#bin/spark-master.sh
+bin/spark-master.sh
 
 
