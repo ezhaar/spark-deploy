@@ -4,6 +4,7 @@
 from subprocess import Popen, PIPE
 import argparse
 import re
+import sys
 
 
 def ssh(vm_ip, verbose=False):
@@ -19,10 +20,11 @@ def ssh(vm_ip, verbose=False):
     return st
 
 
-def scp(vm_ip, verbose=False):
+def scp(vm_ip, file, verbose=False):
+
     try:
         admin_login = "admin@" + vm_ip
-        st = Popen(["scp", "-i", "~/.ssh/id_rsa", admin_login],
+        st = Popen(["scp", "-i", file, admin_login],
                    stdout=PIPE,
                    stderr=PIPE)
     except OSError as (errno, strerr):
@@ -82,13 +84,29 @@ def main():
     num_slaves = args.num_slaves
     master_ip = args.master_ip
     verbose = args.verbose
+    if num_slaves > 10:
+        input = raw_input("Are you sure you want to create " + num_slaves +
+                          " Slaves? (Y/n)")
+        if input != 'Y':
+            print("OK, Give it another try")
+            sys.exit(0)
 
     print("Cluster name will be set to: " + cluster_name)
-    print("To avoid HOSTNAME conflicts, Please verify that cluster name is"
-          "unique... Continue (y/n): ")
+    input = raw_input("To avoid HOSTNAME conflicts, Please verify that cluster
+                      "name is unique... Continue (y/n): ")
+    if input == 'n':
+        print("you did not choose 'y' to Continue")
+        print("system will exit now")
+        sys.exit(0)
+
     slaves_dict = spawn_slaves(cluster_name, num_slaves)
+    slave_hostnames = []
     for slave_id, hostname in slaves_dict.items():
         print(hostname)
+        slave_hostnames.insert(str(hostname))
+    slave_file = open("/tmp/slaves", "w")
+    slave_file.write(slave_hostnames)
+    scp(master_ip, slave_file)
 
 
 if __name__ == "__main__":

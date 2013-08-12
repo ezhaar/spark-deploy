@@ -1,6 +1,6 @@
 #!/bin/bash 
-apt-get update > /dev/null 
-apt-get -y upgrade > /dev/null
+sudo apt-get update > /dev/null 
+sudo apt-get -y upgrade > /dev/null
 
 ## JAVA
 command -v javac>/dev/null 2>&1 || { echo >&2 "I require java but it's not \
@@ -19,14 +19,18 @@ cd ..
 CONF_FILES_DIR=$PWD/config-files
 cd $pwd
 DOWNLOAD_DIR=~/Downloads
-HADOOP_DIR=/usr/local/hadoop
-SCALA_DIR=/usr/local/scala
-SPARK_DIR=/usr/local/spark
+PROJ_DIR=~/SPARK
+HADOOP_DIR=$PROJ_DIR/hadoop
+SCALA_DIR=$PROJ_DIR/scala
+SPARK_DIR=$PROJ_DIR/spark
 # if Downloads folder does not exist, create it
 if [ ! -d $DOWNLOAD_DIR ]; then
     mkdir $DOWNLOAD_DIR
 fi
 cd $DOWNLOAD_DIR
+if [ ! -d $PROJ_DIR ]; then
+    mkdir $PROJ_DIR
+fi
 
 
 ## HADOOP
@@ -46,13 +50,13 @@ else
     #create directory for hadoop to store files
     mkdir -p /home/admin/hadoop
 
-    # copy configuration files for hadoop
+    # copy configuration files for hadoop 
     cp $CONF_FILES_DIR/core-site.xml $HADOOP_DIR/conf
     cp $CONF_FILES_DIR/mapred-site.xml $HADOOP_DIR/conf
     cp $CONF_FILES_DIR/hdfs-site.xml $HADOOP_DIR/conf
     mv $HADOOP_DIR/conf/hadoop-env.sh.template $HADOOP_DIR/conf/hadoop-env.sh
     #set JAVA_HOME in hadoop config file
-    echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /usr/local/hadoop/conf/hadoop-env.sh
+    echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> $HADOOP_DIR/conf/hadoop-env.sh
     # Format the name node
     chmod -R 777 $HADOOP_DIR
     hadoop namenode -format
@@ -72,17 +76,9 @@ else
     tar -zxf scala-2.9.3.tgz
     mv scala-2.9.3 $SCALA_DIR
     chmod -R 777 $SCALA_DIR
-    echo "***** Now buildind Scala *****"
-    echo "***** Creating soft links for scala in /usr/bin ***** "
-
-    ln -s $SCALA_DIR/bin/scala /usr/bin/scala
-    ln -s $SCALA_DIR/bin/scalac /usr/bin/scalac
-    ln -s $SCALA_DIR/bin/fsc /usr/bin/fsc
-    ln -s $SCALA_DIR/bin/sbaz /usr/bin/sbaz
-    ln -s $SCALA_DIR/bin/sbaz-setup /usr/bin/sbaz-setup
-    ln -s $SCALA_DIR/bin/scaladoc /usr/bin/scaladoc
-    ln -s $SCALA_DIR/bin/scalap /usr/bin/scalap
-
+    echo "***** Now Copying Scala *****"
+    echo "export SCALA_HOME=~/SPARK/scala" >> ~/.bashrc
+    echo "export PATH=$PATH:$SPARK_DIR/bin" >> ~/.bashrc
 fi
 
 ## SPARK
@@ -94,10 +90,10 @@ mv $SPARK_DIR/conf/spark-env.sh.template $SPARK_DIR/conf/spark-env.sh
 echo "export SCALA_HOME=$SCALA_DIR" >> $SPARK_DIR/conf/spark-env.sh
 
 #set hadoop version in spark build
-sed -i 's|1.0.4|1.1.2|' $SPARK_DIR/project/SparkBuild.scala
+sed -i 's|1.0.4|1.2.1|' $SPARK_DIR/project/SparkBuild.scala
 cd $SPARK_DIR
 sbt/sbt package
 #start standalone spark cluster
-bin/spark-master.sh
+$SPARK_DIR/bin/spark-master.sh
 
 
