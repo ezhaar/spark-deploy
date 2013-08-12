@@ -20,11 +20,12 @@ def ssh(vm_ip, verbose=False):
     return st
 
 
-def scp(vm_ip, file, verbose=False):
+def scp(vm_ip, filename, verbose=False):
 
     try:
-        admin_login = "admin@" + vm_ip
-        st = Popen(["scp", "-i", file, admin_login],
+        dest = "admin@" + vm_ip + ":/tmp/"
+        print ("copying to " + dest)
+        st = Popen(["scp", filename, dest],
                    stdout=PIPE,
                    stderr=PIPE)
     except OSError as (errno, strerr):
@@ -50,7 +51,7 @@ def spawn_slaves(cluster_name, slave_template, num_slaves):
 
             slave_id = result.strip('VM ID: ').strip('\n')
             vm_info = Popen(["onevm", "show", str(slave_id)],
-                            stdout=subprocess.PIPE).communicate()[0]
+                            stdout=PIPE).communicate()[0]
             ip_list = re.findall(r'[0-9]+(?:\.[0-9]+){3}', vm_info)
 
             slaves_list[slave_id] = ip_list[0]
@@ -84,6 +85,8 @@ def main():
     num_slaves = args.num_slaves
     master_ip = args.master_ip
     verbose = args.verbose
+    filename = "/tmp/slaves"
+    slave_template = "41"
     if num_slaves > 10:
         input = raw_input("Are you sure you want to create " + num_slaves +
                           " Slaves? (Y/n)")
@@ -92,21 +95,23 @@ def main():
             sys.exit(0)
 
     print("Cluster name will be set to: " + cluster_name)
-    input = raw_input("To avoid HOSTNAME conflicts, Please verify that cluster
+    input = raw_input("To avoid HOSTNAME conflicts, Please verify that cluster"
                       "name is unique... Continue (y/n): ")
     if input == 'n':
         print("you did not choose 'y' to Continue")
         print("system will exit now")
         sys.exit(0)
 
-    slaves_dict = spawn_slaves(cluster_name, num_slaves)
+    slaves_dict = spawn_slaves(cluster_name, slave_template, num_slaves)
+#    slaves_dict = {"192.168.1.150":"192.168.1.150"}
     slave_hostnames = []
     for slave_id, hostname in slaves_dict.items():
         print(hostname)
-        slave_hostnames.insert(str(hostname))
-    slave_file = open("/tmp/slaves", "w")
-    slave_file.write(slave_hostnames)
-    scp(master_ip, slave_file)
+        slave_hostnames.append(str(hostname))
+    slave_file = open(filename, "w")
+    for host in slave_hostnames:
+        slave_file.write(host + "\n")
+    scp(master_ip, filename)
 
 
 if __name__ == "__main__":

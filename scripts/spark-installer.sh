@@ -54,7 +54,7 @@ else
     cp $CONF_FILES_DIR/core-site.xml $HADOOP_DIR/conf
     cp $CONF_FILES_DIR/mapred-site.xml $HADOOP_DIR/conf
     cp $CONF_FILES_DIR/hdfs-site.xml $HADOOP_DIR/conf
-    mv $HADOOP_DIR/conf/hadoop-env.sh.template $HADOOP_DIR/conf/hadoop-env.sh
+#    mv $HADOOP_DIR/conf/hadoop-env.sh.template $HADOOP_DIR/conf/hadoop-env.sh
     #set JAVA_HOME in hadoop config file
     echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> $HADOOP_DIR/conf/hadoop-env.sh
     # Format the name node
@@ -93,7 +93,5 @@ echo "export SCALA_HOME=$SCALA_DIR" >> $SPARK_DIR/conf/spark-env.sh
 sed -i 's|1.0.4|1.2.1|' $SPARK_DIR/project/SparkBuild.scala
 cd $SPARK_DIR
 sbt/sbt package
-#start standalone spark cluster
-$SPARK_DIR/bin/spark-master.sh
-
+echo "*********** Spark Done ************"
 
