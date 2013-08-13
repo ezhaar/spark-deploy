@@ -27,24 +27,24 @@ Requirements
   $ echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.bashrc
 
 - Install Scala::
+  
   $ wget http://www.scala-lang.org/downloads/distrib/files/scala-2.9.3.tgz
+  
   $ tar -zxvf scala-2.9.3.tgz
-  $ sudo cp -R scala-2.9.3 /usr/local/scala-2.9.3
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/scala /usr/bin/scala
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/scalac /usr/bin/scalac
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/fsc /usr/bin/fsc
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/sbaz /usr/bin/sbaz
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/sbaz-setup /usr/bin/sbaz-setup
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/scaladoc /usr/bin/scaladoc
-  $ sudo ln -s /usr/local/scala-2.9.3/bin/scalap /usr/bin/scalap
+
+  $ echo "export PATH=$PATH:/path/to/scala/bin" >> ~/.bashrc
 
 - Install Spark::
+
   $ git clone git://github.com/mesos/spark.git
+  
   $ cd spark
+  
   $ sbt/sbt package
+  
   $ mv conf/spark-env.sh-template conf/spark-env.sh
   Add the following line to your init file::
-  ``export SCALA_HOME=/usr/share/scala``
+  ``export SCALA_HOME=/path/to/scala``
 
 Test Run
 --------

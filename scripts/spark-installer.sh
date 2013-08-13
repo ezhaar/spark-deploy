@@ -82,9 +82,10 @@ else
 fi
 
 ## SPARK
-git clone git://github.com/mesos/spark.git
+wget http://www.spark-project.org/download/spark-0.7.3-sources.tgz -P $DOWNLOAD_DIR
+tar -xzf $DOWNLOAD_DIR/spark-0.7.3-sources.tgz
 # Now build Spark
-cp -R $DOWNLOAD_DIR/spark $SPARK_DIR
+cp -R $DOWNLOAD_DIR/spark-0.7.3 $SPARK_DIR
 
 mv $SPARK_DIR/conf/spark-env.sh.template $SPARK_DIR/conf/spark-env.sh
 echo "export SCALA_HOME=$SCALA_DIR" >> $SPARK_DIR/conf/spark-env.sh

@@ -21,8 +21,8 @@ Spark Slaves
   key in USER_PUBKEY
 - Run the deploy script::
   
-  $ /path/to/script/spark_deploy.py -c <cluster_name> -n  <num_slaves> -m \
-  <master_ip> 
+  ``$ /path/to/script/spark_deploy.py -c <cluster_name> -n  <num_slaves> -m \
+  <master_ip>`` 
 
 - This should spawn ``<n>`` number of slaves and write the slaves hostnames to
   the master's spark directory.
