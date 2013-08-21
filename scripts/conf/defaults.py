@@ -9,10 +9,7 @@ num_slaves = 1
 cluster_name = ""
 # templated id to use for the slaves (string)
 slave_template = "41"
-
-# verbose out (boolean)
-verbose = False
-
 #temp file to hold slave hostnames (string)
 filename = "/tmp/slaves"
 spark_dir = "/home/admin/SPARK/spark/conf/"
+on_username = "izhaar"

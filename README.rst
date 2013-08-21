@@ -10,6 +10,7 @@ Installation and configuration of Spark 0.7.3
 
 - To have a new spark installation, execute the script
   ``scripts/spark-installer.sh``.
-- To deploy a new spark cluster, read the document ``docs/spark-deploy.rst`` and
-  run the script ``spark_deploy.py``.
+- To deploy a new spark cluster using OpenNebula, read
+  the document ``docs/spark-deploy.rst`` and run the 
+  script ``spark_deploy.py``.
 

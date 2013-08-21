@@ -16,10 +16,10 @@ pwd=$PWD
 SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SRC_DIR
 cd ..
-CONF_FILES_DIR=$PWD/config-files
 cd $pwd
 DOWNLOAD_DIR=~/Downloads
 PROJ_DIR=~/SPARK
+CONF_FILES_DIR=$PROJ_DIR/config-files
 HADOOP_DIR=$PROJ_DIR/hadoop
 SCALA_DIR=$PROJ_DIR/scala
 SPARK_DIR=$PROJ_DIR/spark
@@ -78,7 +78,7 @@ else
     chmod -R 777 $SCALA_DIR
     echo "***** Now Copying Scala *****"
     echo "export SCALA_HOME=~/SPARK/scala" >> ~/.bashrc
-    echo "export PATH=$PATH:$SPARK_DIR/bin" >> ~/.bashrc
+    echo "export PATH=$PATH:$SCALA_DIR/bin" >> ~/.bashrc
 fi
 
 ## SPARK

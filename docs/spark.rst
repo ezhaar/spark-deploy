@@ -8,7 +8,8 @@ than using disk I/O.
 Spark is implemented in Scala and it provides API's in ``Scala``, ``python`` and
 ``java``. 
 
-Scala is high level object oriented language which sits on top of JVM. 
+Scala is high level object oriented language which runs on top of JVM. In a
+nutshell Scala is a Java library.  
 
 Spark can run either on a single node in ``local`` mode or in cluster mode using
 a resource manager such as ``Mesos, Yarn`` and ``Amazon EC2``. Spark can also be
