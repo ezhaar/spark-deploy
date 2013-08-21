@@ -116,7 +116,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Create a Spark Cluster on "
                                      "PDC Cloud.", epilog ="Example Usage: "
-                                     "./spark_deploy -c cluster1 -n 5 -m "
+                                     "./spark_deploy.py -c cluster1 -n 5 -m "
                                      "10.10.10.10")
 
     parser.add_argument("-c", "--name", metavar="", dest="cluster_name",
@@ -167,9 +167,8 @@ def main():
     master_key = GetOrGeneratePubKey(master_ip)
     print("\n")
     print("******** Got the master's SSH key **********")
-
     update_status = UpdateMasterPubKey(master_key, on_username)
-    print("******** Updated the master's SSH for user: " + on_username +
+    print("******** Updated master's SSH for user: " + on_username +
           " **********")
     print("\n")
 # Now create the requested number of slaves

@@ -4,27 +4,18 @@ Spark Master
   
   $ onetemplate instantiate <template-id> --name cluster1.master
 
-- Login to the master and generate a key pair::
-
-  $ ssh-keygen -t rsa -C "master-VMNAME"
-
-- Add the public key from ~/.ssh/id_rsa.pub to ~/.ssh/authorized_keys
 - Note the IP address of the master.
+- Make sure that your templates (master and slave) source .bashrc at login
 
 Spark Slaves
 ============
--  On your local machine add the Master's public key to the slave template::
-  
-  $ onetemplate update <template-id>
-  
-  This will open the template in your text editor and you can paste the public
-  key in USER_PUBKEY
+
 - Run the deploy script::
   
   ``$ /path/to/script/spark_deploy.py -c <cluster_name> -n  <num_slaves> -m \
   <master_ip>`` 
 
-- This should spawn ``<n>`` number of slaves and write the slaves hostnames to
+- This will spawn ``<n>`` number of slaves and write the slaves hostnames to
   the master's spark directory.
 
 - You can also specify the options in conf/defaults.py. Please note that the 
