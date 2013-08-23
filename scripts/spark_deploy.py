@@ -8,49 +8,63 @@ import sys
 import conf.defaults as defaults
 
 
-def Ssh(vm_ip, verbose=False):
+def GetOrGeneratePubKey(master_ip, username, verbose):
     try:
-        st = Popen(["ssh", "-l", "admin", "-i", "~/.ssh/id_rsa", vm_ip],
-                   stdout=PIPE,
-                   stderr=PIPE)
-    except OSError as (errno, strerr):
-        print("Could not login...\n User verbose for detailed error msg")
-        if verbose:
-            print(str(errno) + "\n" + str(strerr))
-
-    return st
-
-
-def GetOrGeneratePubKey(master_ip):
-    out = Popen(["./master_keys.sh", master_ip], stdout = PIPE,
-                stderr = PIPE)
-    return out.communicate()[0].strip("\n")
+        out = Popen(["./master_keys.sh", master_ip, username], stdout = PIPE,
+                    stderr = PIPE).communicate()[0].strip("\n")
+        if len(out) < 30:
+            print(out)
+            raise ValueError
+        return out
+    except (ValueError, OSError) as err:
+        print("ERROR: Could not communicate with master")
+        sys.exit(0)
+    except:
+        print("Unknown error Occured")
+        raise
 
 
-def UpdateMasterPubKey(master_ssh_key, on_username):
+def UpdateMasterPubKey(master_ssh_key, verbose):
 
     master_ssh_key = "'Master_SSH_KEY=" + "\"" + master_ssh_key + "\"'"
-    out = Popen(["./update_master_ssh_key.sh", master_ssh_key, on_username],
-                stdout = PIPE,
-                stderr = PIPE)
+    try:
+        if len(master_ssh_key) < 30:
+            raise ValueError
+        out = Popen(["./update_master_ssh_key.sh",
+                     master_ssh_key],
+                    stdout = PIPE,
+                    stderr = PIPE).communicate()[0]
+        return out
+        if "ERROR" in out:
+            print(out)
+            raise ValueError
+    except (OSError, ValueError) as err:
+        print("Could not update key in user profile")
+        if verbose:
+            print(err)
+        sys.exit(0)
+    except:
+        print("Unknown error Occured")
+        raise
 
-    return out.communicate()[0]
 
-
-def Scp(vm_ip, filename, spark_dir, verbose=False):
+def Scp(vm_ip, remote_username, filename, spark_dir, verbose=False):
 
     try:
-        dest = "admin@" + vm_ip + ":" + spark_dir
+        dest = remote_username + "@" + vm_ip + ":" + spark_dir
         print ("copying to " + dest)
-        st = Popen(["scp", filename, dest],
-                   stdout=PIPE,
-                   stderr=PIPE)
-    except OSError as (errno, strerr):
+        out = Popen(["scp", filename, dest],
+                    stdout=PIPE,
+                    stderr=PIPE)
+        return out
+    except (OSError, ValueError) as err:
         print("Could not login...\n Use verbose for detailed error msg")
         if verbose:
-            print(str(errno) + "\n" + str(strerr))
-
-    return st
+            print(err)
+        sys.exit(0)
+    except:
+        print("Unknown error Occured")
+        raise
 
 
 def SpawnSlaves(cluster_name, slave_template, num_slaves):
@@ -87,35 +101,40 @@ def CheckArgs(args):
         args.cluster_name = str(args.cluster_name)
         args.master_ip = str(args.master_ip)
 
-# check that there are any slaves to create
+        # check that there are any slaves to create
         if args.num_slaves < 1:
             print("There are no slaves to create...")
             sys.exit(0)
 
-# double check that more than 10 slaves is not a typo
+        # double check that more than 10 slaves is not a typo
         if args.num_slaves > 10:
             input = raw_input("Are you sure you want to create "
-                              + args.num_slaves
+                              + str(args.num_slaves)
                               + " Slaves? (y/n)")
             if input != 'y':
                 print("OK, Give it another try")
                 sys.exit(0)
 
-# Check that master has a public ip address
-        if (args.master_ip).startswith("192"):
-            print("I need a public IP address. Exit...")
-            sys.exit(0)
+        # Check that master has a public ip address
+        print("\nTesting ssh into master... ")
+        out = Popen(["./test_ssh.sh", args.master_ip], stdout = PIPE,
+                    stderr = PIPE).communicate()[0].strip("\n")
+        if "ERROR" in out:
+            print(out)
+            raise ValueError
 
+        print("SSH DONE... ")
         return args
-    except:
-        print("please recheck your arguments")
-        raise
+
+    except (OSError, ValueError) as err:
+        print("Please recheck your arguments\n")
+        sys.exit(0)
 
 
 def main():
 
     parser = argparse.ArgumentParser(description="Create a Spark Cluster on "
-                                     "PDC Cloud.", epilog ="Example Usage: "
+                                     "PDC Cloud.", epilog = "Example Usage: "
                                      "./spark_deploy.py -c cluster1 -n 5 -m "
                                      "10.10.10.10")
 
@@ -150,11 +169,11 @@ def main():
     filename = defaults.filename
     slave_template = defaults.slave_template
     spark_dir = defaults.spark_dir
-    on_username = defaults.on_username
+    remote_username = defaults.remote_username
 
     if dryrun:
         print("\n")
-        print("Username: " + str(on_username))
+        print("Remote Username: " + str(remote_username))
         print("Cluster Name: " + str(cluster_name))
         print("Master IP: " + str(master_ip))
         print("Number of Slaves: " + str(num_slaves))
@@ -163,13 +182,17 @@ def main():
         print("\n")
         sys.exit(0)
 # Get the Master's public key
-
-    master_key = GetOrGeneratePubKey(master_ip)
+    master_key = GetOrGeneratePubKey(master_ip, remote_username, verbose)
     print("\n")
     print("******** Got the master's SSH key **********")
-    update_status = UpdateMasterPubKey(master_key, on_username)
-    print("******** Updated master's SSH for user: " + on_username +
-          " **********")
+    update_status = UpdateMasterPubKey(master_key, verbose)
+    if "ERROR" in update_status:
+        print update_status
+        sys.exit(0)
+
+    if verbose:
+        print(update_status)
+    print("******** Updated master's SSH key **********")
     print("\n")
 # Now create the requested number of slaves
 # confirm cluster name
@@ -193,7 +216,7 @@ def main():
         slave_file.write(host + "\n")
 
 # move slaves file to master's spark conf directory
-    Scp(master_ip, filename, spark_dir, verbose)
+    Scp(master_ip, remote_username, filename, spark_dir, verbose)
 
     print("\n")
     print("*********** All Slaves Created *************")
@@ -201,5 +224,7 @@ def main():
     print("*********** Check that all slaves are RUNNING *************")
     print("*********** Login to Master and run start_all.sh *************")
     print("\n")
+
+
 if __name__ == "__main__":
     main()

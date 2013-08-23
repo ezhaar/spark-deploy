@@ -11,5 +11,7 @@ cluster_name = ""
 slave_template = "41"
 #temp file to hold slave hostnames (string)
 filename = "/tmp/slaves"
-spark_dir = "/home/admin/SPARK/spark/conf/"
-on_username = "izhaar"
+# remote username on master e.g. admin or root
+remote_username = "admin"
+#conf files directory for spark
+spark_dir = "/home/"+remote_username+"/SPARK/spark/conf/"
