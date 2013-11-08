@@ -8,9 +8,15 @@
     <name>fs.default.name</name>
     <value>hdfs://localhost:9000</value>
   </property>
-  <property>
-    <name>hadoop.tmp.dir</name>
-    <value>/home/admin/hadoop</value>
-    <description>A base for other temporary directories.</description>
-  </property>
+
+ <property>
+   <name>yarn.nodemanager.aux-services</name>
+   <value>mapreduce_shuffle</value>
+ </property>
+
+ <property>
+   <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+   <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+ </property>
+
 </configuration>

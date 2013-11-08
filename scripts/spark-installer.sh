@@ -38,17 +38,23 @@ hadoop -h 2>&1>/dev/null
 if [ $? == 0 ]; then
     echo 'Hadoop was found'
 else
-    wget http://psg.mtu.edu/pub/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz -P $DOWNLOAD_DIR
-    tar -xzf $DOWNLOAD_DIR/hadoop-1.2.1.tar.gz
-    mv hadoop-1.2.1 $HADOOP_DIR
+    #wget http://psg.mtu.edu/pub/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz -P $DOWNLOAD_DIR
+    wget http://apache.claz.org/hadoop/common/hadoop-2.2.0/hadoop-2.2.0.tar.gz -P $DOWNLOAD_DIR
+    tar -xzf $DOWNLOAD_DIR/hadoop-2.2.0.tar.gz
+    mv hadoop-2.2.0 $HADOOP_DIR
     if [ -z "$HADOOP_PREFIX" ]; then
         echo "export HADOOP_PREFIX=$HADOOP_DIR" >> ~/.bashrc
         echo "export PATH=$PATH:$HADOOP_DIR/bin" >> ~/.bashrc
+        echo "export PATH=$PATH:$HADOOP_DIR/sbin" >> ~/.bashrc
+        echo "export HADOOP_MAPRED_HOME=$HADOOP_DIR" >> ~/.bashrc
+        echo "export HADOOP_COMMON_HOME=$HADOOP_DIR" >> ~/.bashrc
+        echo "export HADOOP_HDFS_HOME=$HADOOP_DIR" >> ~/.bashrc
+        echo "export YARN_HOME=$HADOOP_DIR" >> ~/.bashrc
         source ~/.bashrc
     fi
 
     #create directory for hadoop to store files
-    mkdir -p /home/admin/hadoop
+    mkdir -p /home/$USER/hadoop_data
 
     # copy configuration files for hadoop 
     cp $CONF_FILES_DIR/core-site.xml $HADOOP_DIR/conf
@@ -82,17 +88,19 @@ else
 fi
 
 ## SPARK
-wget http://www.spark-project.org/download/spark-0.7.3-sources.tgz -P $DOWNLOAD_DIR
-tar -xzf $DOWNLOAD_DIR/spark-0.7.3-sources.tgz
+#wget http://www.spark-project.org/download/spark-0.7.3-sources.tgz -P $DOWNLOAD_DIR
+wget http://spark-project.org/download/spark-0.8.0-incubating.tgz -P $DOWNLOAD_DIR
+tar -xzf $DOWNLOAD_DIR/spark-0.8.0-incubating.tgz
 # Now build Spark
-cp -R $DOWNLOAD_DIR/spark-0.7.3 $SPARK_DIR
+cp -R $DOWNLOAD_DIR/spark-0.8.0-incubating $SPARK_DIR
 
 mv $SPARK_DIR/conf/spark-env.sh.template $SPARK_DIR/conf/spark-env.sh
 echo "export SCALA_HOME=$SCALA_DIR" >> $SPARK_DIR/conf/spark-env.sh
 
 #set hadoop version in spark build
-sed -i 's|1.0.4|1.2.1|' $SPARK_DIR/project/SparkBuild.scala
+sed -i 's|1.0.4|2.2.0|' $SPARK_DIR/project/SparkBuild.scala
+echo "SPARK_YARN=true" | tee -a $SPARK_DIR/project/SparkBuild.scala
 cd $SPARK_DIR
-sbt/sbt package
+sbt/sbt assembly
 echo "*********** Spark Done ************"
 
