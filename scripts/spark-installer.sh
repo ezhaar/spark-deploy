@@ -55,7 +55,8 @@ else
 
     #create directory for hadoop to store files
     mkdir -p /home/$USER/hadoop_data
-
+    mkdir -p /home/$USER/hadoop_data/hdfs/namenode
+    mkdir -p /home/$USER/hadoop_data/hdfs/datanode
     # copy configuration files for hadoop 
     cp $CONF_FILES_DIR/core-site.xml $HADOOP_DIR/conf
     cp $CONF_FILES_DIR/mapred-site.xml $HADOOP_DIR/conf
